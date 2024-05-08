@@ -3,6 +3,7 @@ from .models import Ticket, Image
 from .serializers import TicketSerializer, ImageSerializer
 
 class TicketViewSet(viewsets.ModelViewSet):
+    queryset = Ticket.objects.none()
     serializer_class = TicketSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -10,6 +11,7 @@ class TicketViewSet(viewsets.ModelViewSet):
         return Ticket.objects.filter(user=self.request.user)
 
 class ImageViewSet(viewsets.ModelViewSet):
+    queryset = Ticket.objects.none()
     serializer_class = ImageSerializer
     permission_classes = [permissions.IsAuthenticated]
 

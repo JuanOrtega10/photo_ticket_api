@@ -3,8 +3,8 @@ from .views import TicketViewSet, ImageViewSet
 from django.urls import include, path
 
 router = DefaultRouter()
-router.register(r'tickets', TicketViewSet)
-router.register(r'images', ImageViewSet)
+router.register(r'tickets', TicketViewSet, basename='ticket')
+router.register(r'images', ImageViewSet, basename='image')
 
 urlpatterns = [
     path('', include(router.urls)),
