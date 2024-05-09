@@ -28,6 +28,9 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-c@8fm@!wb8$8+fp_cn!j+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default='redis://localhost:6379/0')
+
 ALLOWED_HOSTS = []
 
 
