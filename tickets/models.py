@@ -19,6 +19,7 @@ class Ticket(models.Model):
 class Image(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='images')
     image_url = models.URLField()
+    public_id = models.CharField(max_length=255)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
