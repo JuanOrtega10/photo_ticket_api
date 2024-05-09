@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import datetime
+import cloudinary
 from pathlib import Path
 
 from decouple import config
@@ -120,6 +121,13 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=15),
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=15),
 }
+
+cloudinary.config(
+  cloud_name=config('CLOUDINARY_CLOUD_NAME'),
+  api_key=config('CLOUDINARY_API_KEY'),
+  api_secret=config('CLOUDINARY_API_SECRET'),
+  secure=config('CLOUDINARY_SECURE')
+)
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
