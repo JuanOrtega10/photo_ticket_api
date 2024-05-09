@@ -11,7 +11,7 @@ class Ticket(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     total_images = models.IntegerField()
-    current_images = models.IntegerField()
+    current_images = models.IntegerField(default=0)
 
     def __str__(self):
         return f"Ticket {self.id} - {self.status}"
