@@ -1,4 +1,5 @@
-from rest_framework import viewsets
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets, status
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -6,7 +7,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .models import Ticket, Image
 from .serializers import TicketSerializer, ImageSerializer
-from .tasks import upload_image_to_cloudinary
+from .tasks import handle_image_upload
 
 
 class TicketViewSet(viewsets.ModelViewSet):
@@ -38,15 +39,21 @@ class TicketImageViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         ticket_id = self.kwargs.get('ticket_id')
-        file = request.FILES.get('file')  # Get the file from the request
+        ticket = get_object_or_404(Ticket, pk=ticket_id)
+
+        # Check if the ticket has reached its limit of images
+        if ticket.current_images == ticket.total_images or ticket.status == 'completed':
+            return Response({'error': 'All images for this ticket have already been uploaded. The ticket is complete.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        file = request.FILES.get('file')
         if not file:
-            return Response({'error': 'No file provided.'}, status=400)
+            return Response({'error': 'No file provided.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Save the file temporarily and send it to Celery task
-        temp_file_path = file.temporary_file_path()
-        upload_image_to_cloudinary.delay(temp_file_path, ticket_id)
+        # Enqueue the image for processing and upload
+        handle_image_upload.delay(file.read(), file.name, ticket_id)
 
-        return Response({'status': 'Upload in progress'}, status=202)
+        return Response({'status': 'Upload in progress'}, status=status.HTTP_202_ACCEPTED)
 
 class TicketDetailViewSet(viewsets.GenericViewSet):
     queryset = Ticket.objects.none()
@@ -55,6 +62,6 @@ class TicketDetailViewSet(viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
 
     def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
+        instance = get_object_or_404(Ticket.objects.prefetch_related('images'), pk=kwargs.get('pk'))
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
