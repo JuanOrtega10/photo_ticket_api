@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 class Ticket(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
-        ('active', 'Active'),
         ('completed', 'Completed')
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tickets')
@@ -12,6 +11,7 @@ class Ticket(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     total_images = models.IntegerField()
+    current_images = models.IntegerField()
 
     def __str__(self):
         return f"Ticket {self.id} - {self.status}"
