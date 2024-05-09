@@ -1,11 +1,12 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .models import Ticket, Image
 from .serializers import TicketSerializer, ImageSerializer
+from .tasks import upload_image_to_cloudinary
 
 
 class TicketViewSet(viewsets.ModelViewSet):
@@ -31,13 +32,21 @@ class TicketViewSet(viewsets.ModelViewSet):
 class TicketImageViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.none()
     serializer_class = ImageSerializer
+    parser_classes = [MultiPartParser]  # To handle file uploads in the request
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
         ticket_id = self.kwargs.get('ticket_id')
-        ticket = get_object_or_404(Ticket, pk=ticket_id)
-        serializer.save(ticket=ticket)
+        file = request.FILES.get('file')  # Get the file from the request
+        if not file:
+            return Response({'error': 'No file provided.'}, status=400)
+
+        # Save the file temporarily and send it to Celery task
+        temp_file_path = file.temporary_file_path()
+        upload_image_to_cloudinary.delay(temp_file_path, ticket_id)
+
+        return Response({'status': 'Upload in progress'}, status=202)
 
 class TicketDetailViewSet(viewsets.GenericViewSet):
     queryset = Ticket.objects.none()
