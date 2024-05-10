@@ -11,10 +11,7 @@ def handle_image_upload(image_data, file_name, ticket_id):
 
     # Upload the file to Cloudinary
     upload_result = upload(
-        image_file,
-        fetch_format='auto',
-        quality='auto',
-        resource_type='image'
+        image_file, fetch_format="auto", quality="auto", resource_type="image"
     )
     image_url = upload_result["secure_url"]
     public_id = upload_result["public_id"]
@@ -26,5 +23,5 @@ def handle_image_upload(image_data, file_name, ticket_id):
     # Update the ticket's current image count and check completion
     ticket.current_images += 1
     if ticket.current_images == ticket.total_images:
-        ticket.status = 'completed'
+        ticket.status = "completed"
     ticket.save()

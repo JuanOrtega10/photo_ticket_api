@@ -18,9 +18,9 @@ class TicketViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Ticket.objects.filter(user=self.request.user)
-        start_date = self.request.query_params.get('start_date')
-        end_date = self.request.query_params.get('end_date')
-        status = self.request.query_params.get('status')
+        start_date = self.request.query_params.get("start_date")
+        end_date = self.request.query_params.get("end_date")
+        status = self.request.query_params.get("status")
 
         if start_date:
             queryset = queryset.filter(created_at__gte=start_date)
@@ -40,6 +40,7 @@ class TicketViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
+
 class TicketImageViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.none()
     serializer_class = ImageSerializer
@@ -48,22 +49,30 @@ class TicketImageViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        ticket_id = self.kwargs.get('ticket_id')
+        ticket_id = self.kwargs.get("ticket_id")
         ticket = get_object_or_404(Ticket, pk=ticket_id)
 
         # Check if the ticket has reached its limit of images
-        if ticket.current_images == ticket.total_images or ticket.status == 'completed':
-            return Response({'error': 'All images for this ticket have already been uploaded. The ticket is complete.'},
-                            status=status.HTTP_400_BAD_REQUEST)
+        if ticket.current_images == ticket.total_images or ticket.status == "completed":
+            return Response(
+                {
+                    "error": "All images for this ticket have already been uploaded. The ticket is complete."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        file = request.FILES.get('file')
+        file = request.FILES.get("file")
         if not file:
-            return Response({'error': 'No file provided.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "No file provided."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         # Enqueue the image for processing and upload
         handle_image_upload.delay(file.read(), file.name, ticket_id)
 
-        return Response({'status': 'Upload in progress'}, status=status.HTTP_202_ACCEPTED)
+        return Response(
+            {"status": "Upload in progress"}, status=status.HTTP_202_ACCEPTED
+        )
 
     def update(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -82,6 +91,8 @@ class TicketDetailViewSet(viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
 
     def retrieve(self, request, *args, **kwargs):
-        instance = get_object_or_404(Ticket.objects.prefetch_related('images'), pk=kwargs.get('pk'))
+        instance = get_object_or_404(
+            Ticket.objects.prefetch_related("images"), pk=kwargs.get("pk")
+        )
         serializer = self.get_serializer(instance)
         return Response(serializer.data)

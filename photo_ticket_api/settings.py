@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
+
 import datetime
 import cloudinary
 from pathlib import Path
@@ -23,13 +24,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-c@8fm@!wb8$8+fp_cn!j+g%craumsr5j+=76&0w^kwurvr5efn')
+SECRET_KEY = config(
+    "SECRET_KEY",
+    default="django-insecure-c@8fm@!wb8$8+fp_cn!j+g%craumsr5j+=76&0w^kwurvr5efn",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = config("DEBUG", default=False, cast=bool)
 
-CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default='redis://localhost:6379/0')
+CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = config(
+    "CELERY_RESULT_BACKEND", default="redis://localhost:6379/0"
+)
 
 ALLOWED_HOSTS = []
 
@@ -44,18 +50,16 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    'rest_framework_simplejwt',
+    "rest_framework_simplejwt",
     "user_management",
     "tickets",
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
 }
 
 
@@ -94,16 +98,15 @@ WSGI_APPLICATION = "photo_ticket_api.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': config('DATABASE_ENGINE', default='django.db.backends.postgresql'),
-        'NAME': config('DATABASE_NAME', default='photo_ticket_api'),
-        'USER': config('DATABASE_USER'),
-        'PASSWORD': config('DATABASE_PASSWORD'),
-        'HOST': config('DATABASE_HOST', default='localhost'),
-        'PORT': config('DATABASE_PORT', default='5432'),
+    "default": {
+        "ENGINE": config("DATABASE_ENGINE", default="django.db.backends.postgresql"),
+        "NAME": config("DATABASE_NAME", default="photo_ticket_api"),
+        "USER": config("DATABASE_USER"),
+        "PASSWORD": config("DATABASE_PASSWORD"),
+        "HOST": config("DATABASE_HOST", default="localhost"),
+        "PORT": config("DATABASE_PORT", default="5432"),
     }
 }
-
 
 
 # Password validation
@@ -126,15 +129,15 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=15),
-    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=15),
+    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(days=15),
+    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=15),
 }
 
 cloudinary.config(
-  cloud_name=config('CLOUDINARY_CLOUD_NAME'),
-  api_key=config('CLOUDINARY_API_KEY'),
-  api_secret=config('CLOUDINARY_API_SECRET'),
-  secure=config('CLOUDINARY_SECURE')
+    cloud_name=config("CLOUDINARY_CLOUD_NAME"),
+    api_key=config("CLOUDINARY_API_KEY"),
+    api_secret=config("CLOUDINARY_API_SECRET"),
+    secure=config("CLOUDINARY_SECURE"),
 )
 
 # Internationalization
