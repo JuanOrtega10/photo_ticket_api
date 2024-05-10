@@ -30,6 +30,16 @@ class TicketViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(status=status)
 
         return queryset
+
+    def update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 class TicketImageViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.none()
     serializer_class = ImageSerializer
@@ -54,6 +64,16 @@ class TicketImageViewSet(viewsets.ModelViewSet):
         handle_image_upload.delay(file.read(), file.name, ticket_id)
 
         return Response({'status': 'Upload in progress'}, status=status.HTTP_202_ACCEPTED)
+
+    def update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 class TicketDetailViewSet(viewsets.GenericViewSet):
     queryset = Ticket.objects.none()
